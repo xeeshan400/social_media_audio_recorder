@@ -224,6 +224,11 @@ class _RecordButtonState extends State<RecordButton> {
       ),
     );
   }
+  kVibrate()async{
+    if (await Vibration.hasVibrator()) {
+    Vibration.vibrate();
+    }
+  }
 
   Widget timerLocked() {
     return Positioned(
@@ -241,7 +246,8 @@ class _RecordButtonState extends State<RecordButton> {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () async {
-              Vibrate.feedback(FeedbackType.success);
+              kVibrate();
+              // Vibrate.feedback(FeedbackType.success);
               timer?.cancel();
               timer = null;
               startTime = null;
@@ -310,7 +316,8 @@ class _RecordButtonState extends State<RecordButton> {
         debugPrint("onLongPressEnd");
 
         if (isCancelled(details.localPosition, context)) {
-          Vibrate.feedback(FeedbackType.heavy);
+          kVibrate();
+          // Vibrate.feedback(FeedbackType.heavy);
 
           timer?.cancel();
           timer = null;
@@ -332,8 +339,8 @@ class _RecordButtonState extends State<RecordButton> {
           });
         } else if (checkIsLocked(details.localPosition)) {
           widget.controller.reverse();
-
-          Vibrate.feedback(FeedbackType.heavy);
+          kVibrate();
+          // Vibrate.feedback(FeedbackType.heavy);
           debugPrint("Locked recording");
           debugPrint(details.localPosition.dy.toString());
           setState(() {
@@ -343,8 +350,8 @@ class _RecordButtonState extends State<RecordButton> {
         } else {
           widget.controller.reverse();
 
-          Vibrate.feedback(FeedbackType.success);
-
+          // Vibrate.feedback(FeedbackType.success);
+          kVibrate();
           timer?.cancel();
           timer = null;
           startTime = null;
@@ -365,7 +372,8 @@ class _RecordButtonState extends State<RecordButton> {
       },
       onLongPress: () async {
         debugPrint("onLongPress");
-        Vibrate.feedback(FeedbackType.success);
+        kVibrate();
+        // Vibrate.feedback(FeedbackType.success);
         if (await Record().hasPermission()) {
           record = Record();
           await record!.start(
