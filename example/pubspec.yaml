@@ -39,7 +39,7 @@ dependencies:
   voice_message_package: ^0.0.74
   social_media_audio_recorder:
     git:
-      url: https://github.com/fuadmostafij6/social_media_audio_recorder.git
+      url: https://github.com/xeeshan400/social_media_audio_recorder.git
 
 dev_dependencies:
   flutter_test:
