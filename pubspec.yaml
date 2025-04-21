@@ -1,6 +1,6 @@
 name: social_media_audio_recorder
 description: A flutter package that use for build animated voice recorder as like other social media.
-version: 0.0.12
+version: 0.0.13
 homepage: https://github.com/xeeshan400/social_media_audio_recorder.git
 
 environment:
