@@ -39,20 +39,20 @@ class RecordButton extends StatefulWidget {
   final Function onCancelRecord;
   const RecordButton(
       {Key? key,
-      required this.controller,
-        this.releaseToSend=false,
-      this.timerWidth,
-      this.lockerHeight = 200,
-      this.size = 55,
-      this.color = Colors.white,
-      this.radius = 10,
-      required this.onRecordEnd,
-      required this.onRecordStart,
-      required this.onCancelRecord,
-      this.allTextColor,
-      this.arrowColor,
-      this.recordButtonColor,
-      this.recordBgColor, })
+        required this.controller,
+        this.releaseToSend = false,
+        this.timerWidth,
+        this.lockerHeight = 200,
+        this.size = 55,
+        this.color = Colors.white,
+        this.radius = 10,
+        required this.onRecordEnd,
+        required this.onRecordStart,
+        required this.onCancelRecord,
+        this.allTextColor,
+        this.arrowColor,
+        this.recordButtonColor,
+        this.recordBgColor})
       : super(key: key);
 
   @override
@@ -69,7 +69,9 @@ class _RecordButtonState extends State<RecordButton> {
   DateTime? startTime;
   Timer? timer;
   String recordDuration = "00:00";
-  Record? record;
+
+  // Updated: Using late initialization for the recorder
+  late final AudioRecorder _audioRecorder;
 
   bool isLocked = false;
   bool showLottie = false;
@@ -77,7 +79,9 @@ class _RecordButtonState extends State<RecordButton> {
   @override
   void initState() {
     super.initState();
-    //init();
+    // Initialize the audio recorder
+    _audioRecorder = AudioRecorder();
+
     buttonScaleAnimation = Tween<double>(begin: 1, end: 2).animate(
       CurvedAnimation(
         parent: widget.controller,
@@ -93,7 +97,7 @@ class _RecordButtonState extends State<RecordButton> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     timerWidth =
-        (widget.timerWidth ?? MediaQuery.of(context).size.width - 2 * 8 - 4);
+    (widget.timerWidth ?? MediaQuery.of(context).size.width - 2 * 8 - 4);
     timerAnimation = Tween<double>(begin: timerWidth + 8, end: 0).animate(
       CurvedAnimation(
         parent: widget.controller,
@@ -102,18 +106,17 @@ class _RecordButtonState extends State<RecordButton> {
     );
     lockerAnimation =
         Tween<double>(begin: widget.lockerHeight! + 8, end: 0).animate(
-      CurvedAnimation(
-        parent: widget.controller,
-        curve: const Interval(0.2, 1, curve: Curves.easeIn),
-      ),
-    );
+          CurvedAnimation(
+            parent: widget.controller,
+            curve: const Interval(0.2, 1, curve: Curves.easeIn),
+          ),
+        );
   }
 
   @override
   void dispose() {
-    if (record != null) {
-      record?.dispose();
-    }
+    // Updated: Dispose the recorder properly
+    _audioRecorder.dispose();
     timer?.cancel();
     timer = null;
     super.dispose();
@@ -135,47 +138,47 @@ class _RecordButtonState extends State<RecordButton> {
   Widget lockSlider() {
     return lockerAnimation!.value == 0.0
         ? Positioned(
-            bottom: -lockerAnimation!.value,
-            child: Container(
-              height: widget.lockerHeight,
-              width: widget.size!,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.radius!),
-                color: widget.color,
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 15),
+      bottom: -lockerAnimation!.value,
+      child: Container(
+        height: widget.lockerHeight,
+        width: widget.size!,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(widget.radius!),
+          color: widget.color,
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            FaIcon(
+              FontAwesomeIcons.lock,
+              size: 20,
+              color: widget.arrowColor ?? Colors.black,
+            ),
+            const SizedBox(height: 8),
+            FlowShader(
+              direction: Axis.vertical,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  FaIcon(
-                    FontAwesomeIcons.lock,
-                    size: 20,
+                  Icon(
+                    Icons.keyboard_arrow_up,
                     color: widget.arrowColor ?? Colors.black,
                   ),
-                  const SizedBox(height: 8),
-                  FlowShader(
-                    direction: Axis.vertical,
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.keyboard_arrow_up,
-                          color: widget.arrowColor ?? Colors.black,
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_up,
-                          color: widget.arrowColor ?? Colors.black,
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_up,
-                          color: widget.arrowColor ?? Colors.black,
-                        ),
-                      ],
-                    ),
+                  Icon(
+                    Icons.keyboard_arrow_up,
+                    color: widget.arrowColor ?? Colors.black,
+                  ),
+                  Icon(
+                    Icons.keyboard_arrow_up,
+                    color: widget.arrowColor ?? Colors.black,
                   ),
                 ],
               ),
             ),
-          )
+          ],
+        ),
+      ),
+    )
         : Container();
   }
 
@@ -198,8 +201,8 @@ class _RecordButtonState extends State<RecordButton> {
               showLottie
                   ? const LottieAnimation()
                   : Text(recordDuration,
-                      style: TextStyle(
-                          color: widget.allTextColor ?? Colors.black)),
+                  style: TextStyle(
+                      color: widget.allTextColor ?? Colors.black)),
               SizedBox(width: widget.size!),
               FlowShader(
                 duration: const Duration(seconds: 3),
@@ -211,7 +214,7 @@ class _RecordButtonState extends State<RecordButton> {
                     Text(
                       "Slide to cancel",
                       style:
-                          TextStyle(color: widget.allTextColor ?? Colors.black),
+                      TextStyle(color: widget.allTextColor ?? Colors.black),
                     )
                   ],
                 ),
@@ -223,9 +226,10 @@ class _RecordButtonState extends State<RecordButton> {
       ),
     );
   }
-  kVibrate()async{
-    if (await Vibration.hasVibrator()) {
-    Vibration.vibrate();
+
+  kVibrate() async {
+    if (await Vibration.hasVibrator() ?? false) {
+      Vibration.vibrate();
     }
   }
 
@@ -246,18 +250,17 @@ class _RecordButtonState extends State<RecordButton> {
             behavior: HitTestBehavior.opaque,
             onTap: () async {
               kVibrate();
-              // Vibrate.feedback(FeedbackType.success);
               timer?.cancel();
               timer = null;
               startTime = null;
               recordDuration = "00:00";
 
-              var filePath = await Record().stop(); //Record file
+              // Updated: Stop recording with new API
+              String ? path = await _audioRecorder.stop();
 
               setState(() {
                 isLocked = false;
-
-                widget.onRecordEnd(filePath!);
+                widget.onRecordEnd(path!);
               });
             },
             child: Row(
@@ -266,7 +269,7 @@ class _RecordButtonState extends State<RecordButton> {
               children: [
                 Text(recordDuration,
                     style:
-                        TextStyle(color: widget.allTextColor ?? Colors.black)),
+                    TextStyle(color: widget.allTextColor ?? Colors.black)),
                 FlowShader(
                   duration: const Duration(seconds: 3),
                   flowColors: [widget.arrowColor ?? Colors.white, Colors.grey],
@@ -316,8 +319,6 @@ class _RecordButtonState extends State<RecordButton> {
 
         if (isCancelled(details.localPosition, context)) {
           kVibrate();
-          // Vibrate.feedback(FeedbackType.heavy);
-
           timer?.cancel();
           timer = null;
           startTime = null;
@@ -330,16 +331,21 @@ class _RecordButtonState extends State<RecordButton> {
           Timer(const Duration(milliseconds: 1440), () async {
             widget.controller.reverse();
             debugPrint("Cancelled recording");
-            var filePath = await record!.stop();
 
-            File(filePath!).delete();
+            // Updated: Stop recording with new API
+            final path = await _audioRecorder.stop();
 
-            showLottie = false;
+            if (path!=null) {
+              File(path).delete();
+            }
+
+            setState(() {
+              showLottie = false;
+            });
           });
         } else if (checkIsLocked(details.localPosition)) {
           widget.controller.reverse();
           kVibrate();
-          // Vibrate.feedback(FeedbackType.heavy);
           debugPrint("Locked recording");
           debugPrint(details.localPosition.dy.toString());
           setState(() {
@@ -348,20 +354,19 @@ class _RecordButtonState extends State<RecordButton> {
           widget.onRecordStart();
         } else {
           widget.controller.reverse();
-
-          // Vibrate.feedback(FeedbackType.success);
           kVibrate();
           timer?.cancel();
           timer = null;
           startTime = null;
           recordDuration = "00:00";
-          var filePath = await record!.stop();
-         // print("fuad");
-          if(widget.releaseToSend!) {
-            widget.onRecordEnd(filePath!);
-          }
-          else{
-             widget.onCancelRecord();
+
+          // Updated: Stop recording with new API
+          final path = await _audioRecorder.stop();
+
+          if (widget.releaseToSend!) {
+            widget.onRecordEnd(path!);
+          } else {
+            widget.onCancelRecord();
           }
         }
       },
@@ -372,16 +377,24 @@ class _RecordButtonState extends State<RecordButton> {
       onLongPress: () async {
         debugPrint("onLongPress");
         kVibrate();
-        // Vibrate.feedback(FeedbackType.success);
-        if (await Record().hasPermission()) {
-          record = Record();
-          await record!.start(
-            path:
-                "${SocialMediaFilePath.documentPath}audio_${DateTime.now().millisecondsSinceEpoch}.acc",
-            encoder: AudioEncoder.aacLc,
-            bitRate: 128000,
-            samplingRate: 44100,
+
+        // Updated: Check permissions with new API
+        final hasPermission = await _audioRecorder.hasPermission();
+        if (hasPermission) {
+          // Generate file path
+          final filePath = "${SocialMediaFilePath.documentPath}audio_${DateTime.now().millisecondsSinceEpoch}.m4a";
+
+          // Updated: Start recording with new API and configuration
+          await _audioRecorder.start(
+            const RecordConfig(
+              encoder: AudioEncoder.aacLc,
+              bitRate: 128000,
+              sampleRate: 44100,
+              numChannels: 2,
+            ),
+            path: filePath,
           );
+
           startTime = DateTime.now();
           timer = Timer.periodic(const Duration(seconds: 1), (_) {
             final minDur = DateTime.now().difference(startTime!).inMinutes;
@@ -392,8 +405,6 @@ class _RecordButtonState extends State<RecordButton> {
               recordDuration = "$min:$sec";
             });
           });
-
-          // widget.onRecordStart();
         }
       },
     );
