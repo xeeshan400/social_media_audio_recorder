@@ -93,7 +93,7 @@ class _ExampleState extends State<Example> with SingleTickerProviderStateMixin {
                         child: TextField(
                           readOnly: readOnly,
                           maxLines: null,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: InputBorder.none,
                           ),
                         ),

@@ -228,8 +228,15 @@ class _RecordButtonState extends State<RecordButton> {
   }
 
   kVibrate() async {
-    if (await Vibration.hasVibrator() ?? false) {
-      Vibration.vibrate();
+    if (await Vibration.hasVibrator()) {
+      // Check if device supports amplitude control
+      if (await Vibration.hasAmplitudeControl()) {
+        // Vibrate with a low amplitude (1-255, where lower is gentler)
+        Vibration.vibrate(amplitude: 80);
+      } else {
+        // If no amplitude control, use a short duration for a gentler effect
+        Vibration.vibrate(duration: 80);
+      }
     }
   }
 

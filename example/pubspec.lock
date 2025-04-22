@@ -148,10 +148,10 @@ packages:
     dependency: transitive
     description:
       name: font_awesome_flutter
-      sha256: "275ff26905134bcb59417cf60ad979136f1f8257f2f449914b2c3e05bbb4cd6f"
+      sha256: d3a89184101baec7f4600d58840a764d2ef760fe1c5a20ef9e6b0e9b24a07a3a
       url: "https://pub.dev"
     source: hosted
-    version: "10.7.0"
+    version: "10.8.0"
   http:
     dependency: transitive
     description:
@@ -458,10 +458,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: b44369d7926f7f09f5158bec4fc2e89f7cc69a1d
+      resolved-ref: "2cbc1f2d02cea04a419cad61ce4eb8dc7562f1e6"
       url: "https://github.com/xeeshan400/social_media_audio_recorder.git"
     source: git
-    version: "0.0.12"
+    version: "0.0.14"
   source_span:
     dependency: transitive
     description:
